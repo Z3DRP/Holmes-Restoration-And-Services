@@ -1,0 +1,19 @@
+﻿@model Railing
+@{
+    ViewData["Title"] = TempData["Action"];
+}
+
+
+<form asp-action="Delete" method="post">
+
+    <input type="hidden" asp-for="Id" />
+    <p>
+        You are about to delete <b>@Model.Name</b> from your design. Do you wish to contiune?
+    </p>
+
+    <button type="submit" class="btn btn-danger">Yes</button>
+    <a asp-area="" asp-action="Details" asp-controller="Customer"
+       asp-route-model="@TempData["Action"]" asp-route-val="@Model.Slug()"
+       class="btn btn-dark">No</a>""
+
+</form>

@@ -1,0 +1,22 @@
+﻿@model DeckingPriceViewModel
+@{
+    ViewData["Title"] = " | " + TempData["Action"];
+}
+
+<h2>Decking Details </h2>
+
+<div class="card" style="width:auto">
+    <img src="~/Images/@Model.Image" alt="Modern Deck" style="width:100%" />
+
+    <h3 class="card-title p-3">@Model.Name</h3>
+    <h6 class="card-subtitle p-1">@Model.Price_Per_SqFt.ToString("C")</h6>
+
+    <p class="card-body p-1">@Model.Description</p>
+
+    <p><button class="btn btn-success" asp-action="Add"
+               asp-controller="Design">Add to Design</button></p>
+    <!--look at nfl teams app to see how to implment the back feature to go back
+        to the previous page with previous selections-->
+    <p><button class="btn-secondary" asp-action="Back"
+               asp-controller="Home">Back</button></p>
+</div>

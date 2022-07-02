@@ -1,0 +1,109 @@
+﻿@model RailListViewModel
+@{
+    ViewData["Title"] = TempData["Action"] = " | Railing Catalog";
+    RouteDictionary current = Model.CurrentRoute;
+    RouteDictionary routes = Model.CurrentRoute.Clone();
+}
+
+<script type="text/javascript">
+
+    if ("@TempData["message"]" != "")
+    {
+        function my_code() {
+        alert("@TempData["message"]");
+    }
+    } // end if
+    window.onload = my_code();
+</script>
+
+<h1>Railing Catalog</h1>
+
+<div class="row">
+    <div class="col-9">
+
+        <form asp-action="Filter" method="post" class="form-inline">
+            <label>Type: </label>
+            <select name="filter" class="form-control m-2"
+                    asp-items="@(new SelectList(
+                    Model.Types, "Id", current.RailTypeFilter))">
+                <option value="@RailingGridDTO.DefaultFilter">All</option>
+            </select>
+
+            <label>Price Group: </label>
+            <select name="filter" class="form-control m-2"
+                    asp-items="@(new SelectList(
+                        Model.Groups, "Id", "Group_Name", current.RailGroupFilter))">
+                <option value="@RailingGridDTO.DefaultFilter">All</option>
+            </select>"
+            <label>Price: </label>
+            <select name="filter" class="form-control m-2"
+                    asp-items="@(new SelectList(
+                    Model.Prices,"Key", "Value", current.RailPriceFilter))">
+                <option value="@RailingGridDTO.DefaultFilter">All</option>
+            </select>
+
+            <button type="submit" class="btn btn-primary mr-2">Filter</button>
+            <button type="submit" class="btn btn-primary" name="clear"
+                    value="true">Clear</button>
+        </form>
+    </div>
+    <div class="col">
+        <form asp-action="PageSize" method="post" class="form-inline">
+            <label>Show All</label>
+            <select name="pagesize" class="form-control m-2"
+                    asp-items="@(new SelectList(Model.PageSizes, current.PageSize))"></select>
+            <button type="submit" class="btn btn-primary mr-2" >Save</button>
+        </form>
+    </div>
+</div>
+<form asp-action="Add" asp-controller="Design" method="post">
+    <table class="table table-borderless table-striped table-sm">
+
+        <thead class="thead-dark">
+            <tr>
+                <th>
+                    @{ routes.SetSortAndDirection(nameof(Railing.Name), current);}
+                    <a asp-action="List" asp-all-route-data="@routes"
+                       class="text-white">Name</a>
+                </th>
+                <th>
+                    @{ routes.SetSortAndDirection(nameof(Railing.Type), current);}
+                    <a asp-action="List" asp-all-route-data="@routes"
+                       class="text-white">Type</a>
+                </th>
+                <th>
+                    @{ routes.SetSortAndDirection(nameof(Railing.Price_Per_SqFt), current);}
+                    <a asp-action="List" asp-all-route-data="@routes"
+                       class="text-white">Price</a>
+                </th>
+                <th>
+                    <span class="fas fa-picture-o">&nbsp;</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Railing rail in Model.Rails)
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@rail.Id"
+                           asp-route-slug="@rail.Name.Slug()">@rail.Name</a>
+                    </td>
+                    <!--Maybe eventually make it to where if you click type it will list all types-->
+                    <td>@rail.Type.Type</td>
+                    <td>@rail.GetFormattedPrice()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>
+@{
+    routes = Model.CurrentRoute.Clone();
+
+    for (int i = 1; i <= Model.TotalPages; i++)
+    {
+        routes.PageNumber = i;
+    <a asp-action="List" asp-all-route-data="@routes"
+           class="btn btn-primary @Nav.Active(i, current.PageNumber)">@i</a>
+    }
+ }

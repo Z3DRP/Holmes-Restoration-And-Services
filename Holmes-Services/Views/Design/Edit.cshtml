@@ -1,0 +1,61 @@
+﻿@model CustomerDesignViewModel
+@{
+    ViewData["Title"] = TempData["Action"];
+}
+
+<h2>@ViewBag.Action</h2>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form asp-controller="Design" asp-action="Edit" method="post">
+    
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="First_Name">First Name:</label>
+        <input asp-for="First_Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Last_Name">Last Name:</label>
+        <input asp-for="Last_Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Email">Email:</label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Phone_Number">Phone Number:</label>
+        <input asp-for="Phone_Number" class="form-control" />
+    </div>
+    <div class="from-group">
+        <label asp-for="Street_Address">Street:</label>
+        <input asp-for="Street_Address" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="City">City:</label>
+        <input asp-for="City" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="State">State:</label>
+        <input asp-for="State" class="form-control" />"
+    </div>
+    <div class="form-group">
+        <label asp-for="Zipcode">Zipcode:</label>
+        <input asp-for="Zipcode" class="form-group" />
+    </div>
+    <div>
+        <span>Enter the dimensions for you design and your desired start date</span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Length">Length:</label>
+        <input asp-for="Length" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Width">Width:</label>
+        <input asp-for="Width" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="StartDate">Start Date:</label>
+        <input type="date" asp-for="StartDate" class="form-group" />
+    </div>
+</form>

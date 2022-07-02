@@ -1,0 +1,85 @@
+﻿@{
+    var current = ViewContext.RouteData.Values["area"]?.ToString() ??
+                ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Holmes_Services</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/Holmes_Services.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HolmesServices</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse" id="menu">
+                    <ul class="navbar-nav flex-grow-1 mr-auto">
+                        <li class="nav-item @Nav.Active("Home",current)">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                                <span class="fas fa-home"></span>&nbsp;Home
+                            </a>
+                        </li>
+                        <li class="nav-item @Nav.Active("Decking", current)">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Decking" asp-action="List">
+                                <span class="fas fa-toolbox">&nbsp;Decking</span>
+                            </a>
+                        </li>
+                        <li class="nav-item @Nav.Active("Railing", current)">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Railing" asp-action="List">
+                                <span class="fas fa-building-columns">&nbsp;Railing</span>
+                            </a>
+                        </li>"
+                        <li class="nav-item @Nav.Active("My Designs", current)">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Design" asp-action="GetMy">
+                                <span class="fas fa-ruler">&nbsp;My Designs</span>
+                            </a>
+                        </li>
+                        <li class="nav-item @Nav.Active("Portfolio", current)">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Portfolllio">
+                                <span class="fas fa-building">&nbsp;Portfollio</span>
+                            </a>
+                        </li>
+                        <li class="nav-item @Nav.Active("Contact", current)">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Contact">
+                                <span class="fas fa-mail-reply">&nbsp;Contact Us</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @if (TempData.Keys.Contains("message"))
+            {
+                <h4 class="bg-info text-center text-white p-2">@TempData["message"]</h4>
+            }
+            @RenderBody()
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2022 - HolmesServices - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/jqueryui/jquery-ui.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,53 @@
+﻿@model Customer
+@{
+    ViewData["Title"] = TempData["Action"];
+}
+
+<h2>@TempData["Action"]</h2>
+
+<ul class="list-group">
+    <li class="list-group-item">
+        <label>First Name:</label>
+        @Model.First_Name
+    </li>
+    <li class="list-group-item">
+        <label>Last Name:</label>
+        @Model.Last_Name
+    </li>
+    <li class="list-group-item">
+        <label>Phone Number:</label>
+        @Model.Phone_Number
+    </li>
+    <li class="list-group-item">
+        <label>Email:</label>
+        @Model.Email
+    </li>
+    <li class="list-group-item">
+        <label>Street:</label>
+        @Model.Street_Address
+    </li>
+    <li class="list-group-item">
+        <label>City:</label>
+        @Model.City
+    </li>
+    <li class="list-group-item">
+        <label>State:</label>
+        @Model.State
+    </li>
+    <li class="list-group-item">
+        <lable>Zipcode:</lable>
+        @Model.Zipcode
+    </li>
+    <li class="list-group-item">
+        <a asp-area="" asp-action="Edit" asp-controller="Customer"
+           asp-route-id="@Model.Id"
+           class="btn btn-dark">Edit</a>
+
+        <a asp-area="" asp-action="Delete" asp-controller="Customer"
+           asp-route-id="@Model.Id"
+           class="btn btn-dark">Delete</a>
+
+        <a asp-area="" asp-action="Index" asp-controller="Home"
+           class="btn btn-primary">Home</a>
+    </li>
+</ul>

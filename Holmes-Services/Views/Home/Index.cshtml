@@ -1,0 +1,43 @@
+﻿@model CustomerListViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container-fluid justify-content-center">
+    <div class="card" style="width:auto">
+        <img class="card-img-top p-1" src="/Images/greyDeck.jpg" alt="Modern deck design" />
+        <br />
+        <div class="card-body bg-warning">
+            <h4 class="card-title p-1">Welcome</h4>
+            <p class="card-text">
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+                ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit
+                in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                proident, sunt in culpa qui est laborum."
+            </p>
+            <a asp-area="" asp-action="Index" asp-controller="Decking" class="btn btn-success">
+                <span class="fas fa-wrench">&nbsp;Get Started</span>
+            </a>
+            <a asp-area="" asp-action="Ideas" asp-controller="Home" class="btn btn-success">
+                <span class="fas fa-lightbulb">&nbsp;Need Insperation</span>
+            </a>
+        </div>
+        <div class="card-footer">
+            <p>Select a deck style and railing you like and add your dimensions of your design to get a estimate<br />
+                If you are happy with your estimate place the order for your design and you will be contacted by Holmes Servies.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div>
+    <h2> Test connection</h2>
+    @{
+        foreach(Customer customer in Model.Customers)
+        {
+            <h2>customer.FirstName</h2>
+        }
+        }
+</div>

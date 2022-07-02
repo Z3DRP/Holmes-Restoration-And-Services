@@ -1,0 +1,125 @@
+﻿@model DeckListViewModel
+@{
+    ViewData["Title"] = TempData["Title"] = " | Decking Catalog";
+    RouteDictionary current = Model.CurrentRoute;
+    RouteDictionary routes = Model.CurrentRoute.Clone();
+}
+
+<script type="text/javascript">
+
+    if ("@TempData["message"]" != "")
+    {
+        function my_code() {
+        alert("@TempData["message"]");
+    }
+    } // end if
+    window.onload = my_code();
+</script>
+
+<h1>Decking Catalog</h1>
+
+<div class="row">
+    <div class="col-9">
+        @*filtering *@
+        <form asp-action="Filter" method="post" class="form-inline">
+            <label>Type: </label>
+            <select name="filter" class="form-control m-2"
+                    asp-items="@(new SelectList(
+                    Model.Types, "Id", "Name", current.DeckTypeFilter))">
+                <option value="@DeckingGridDTO.DefaultFilter">All</option>
+            </select>
+
+            <label>Price Group: </label>
+            <select name="filter" class="form-control m-2"
+                    asp-items="@(new SelectList(
+                        Model.Groups, "Id", "Group_Name", current.DeckGroupFilter))">
+                <option value="@DeckingGridDTO.DefaultFilter">All</option>
+            </select>
+                    
+            <label>Price: </label>
+            <select name="filter" class="form-control m-2"
+                    asp-items="@(new SelectList(
+                    Model.Prices, "Key", "Value", current.DeckPriceFilter))">
+                <option value="@DeckingGridDTO.DefaultFilter">All</option>
+            </select>
+
+            <button type="submit" class="btn btn-primary mr-2">Filter</button>
+            <button type="submit" class="btn btn-primary"
+                    name="clear" value="true">
+                Clear
+            </button>
+        </form>
+    </div>
+    <div class="col">
+        @*Change to swith between display default page size and all*@
+        <form asp-action="PageSize" method="post" class="form-inline">
+            <label>Show All</label>
+            <select name="pagesize" class="form-control m-2"
+                    asp-items="@(new SelectList(Model.PageSizes, current.PageSize))">
+            </select>
+
+            <button type="submit" class="btn btn-primary mr-2">Save</button>
+        </form>
+    </div>
+</div>
+
+    @*add to design*@
+    <form asp-action="Add" asp-controller="Design" method="post">
+        <table class="table table-borderless table-striped table-sm">
+
+            <thead class="thead-dark">
+                <tr>
+                    <th>
+                        <!--Might have to add the price group filter-->
+                        @{ routes.SetSortAndDirection(nameof(Decking.Name), current);}
+                        <a asp-action="List" asp-all-route-data="@routes"
+                           class="text-white">Name</a>
+                    </th>
+                    <th>
+                        @{ routes.SetSortAndDirection(nameof(Decking.Type), current);}
+                        <a asp-action="List" asp-all-route-data="@routes"
+                           class="text-white">Type</a>
+                    </th>
+                    <th>
+                        @{ routes.SetSortAndDirection(nameof(Decking.Price_Per_SqFt), current);}
+                        <a asp-action="List" asp-all-route-data="@routes"
+                           class="text-white">Price</a>
+                    </th>
+                    <th>
+                        <span class="fas fa-picture-o">&nbsp;</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Decking deck in Model.Decks)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@deck.Id"
+                               asp-route-slug="@deck.Name.Slug()">@deck.Name</a>
+                        </td>
+                        <!--Maybe make it to where if you click type it will list all deck types eventually-->
+                        <td>@deck.Type.Type</td>
+                        <td>@deck.GetFormattedPrice()</td>
+                        <td>
+                            <button type="submit" name="id" value="@deck.Id"
+                                    class="btn btn-primary">Add to Design</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </form>
+@*Resett route dictionary to current route values. Have to do this to clearr the changes made
+    while creating the sorting links above close so don't overwrite current route segement vals*@
+@{ 
+    routes = Model.CurrentRoute.Clone();
+    @*update route dictionary with page number in 'i' and then use updated route dict
+        to create route segments for paging link *@
+    for (int i = 1; i <= Model.TotalPages; i++)
+    {
+        routes.PageNumber = i;
+        <a asp-action="List" asp-all-route-data="@routes"
+            class="btn btn-primary @Nav.Active(i, current.PageNumber)">@i</a>
+    }
+}
