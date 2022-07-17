@@ -28,6 +28,8 @@ namespace Holmes_Services.Models.DomainModels
         [ForeignKey(nameof(Design_Id))]
         public Design Design { get; set; }
 
+        // nav property
+        public CompletedJob Completed_Job { get; set; }
         public string Slug() => Customer_Id.ToString() + "-" + Design_Id.ToString();
     }
 }

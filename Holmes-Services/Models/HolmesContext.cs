@@ -17,6 +17,8 @@ namespace Holmes_Services.Models
         public DbSet<Design> Designs { get; set; }
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Pattern> Patterns { get; set; }
+        public DbSet<Idea> Ideas { get; set; }
+        public DbSet<CompletedJob> CompletedJobs { get; set; }
 
 
 
@@ -79,6 +81,14 @@ namespace Holmes_Services.Models
             //model.Entity<Railing>().HasOne(r => r.Type)
             //    .WithMany(rt => rt.Railings).HasForeignKey(r => r.Type_Id);
 
+            // idea table
+            model.Entity<Idea>().HasKey(i => new {i.Id});
+            model.Entity<Idea>().HasOne(d => d.Deck)
+                .WithMany(d => d.Ideas).HasForeignKey(i => i.Id);
+            model.Entity<Idea>().HasOne(r => r.Rail)
+                .WithMany(r => r.Ideas).HasForeignKey(i => i.Id);
+            model.Entity<Idea>().HasOne(p => p.Pattern)
+                .WithMany(p => p.Ideas).HasForeignKey(i => i.Id);
             //designs
             model.Entity<Design>().HasKey(d => new { d.Id });
 
@@ -105,7 +115,10 @@ namespace Holmes_Services.Models
 
             model.Entity<Job>().HasOne(c => c.Customer)
                 .WithMany(c => c.Jobs).HasForeignKey(cj => cj.Customer_Id);
-
+            // completed jobs
+            model.Entity<CompletedJob>().HasKey(j => new { j.Id });
+            model.Entity<CompletedJob>().HasOne(cj => cj.Job)
+                .WithOne(j => j.Completed_Job);
         }
     }
 }

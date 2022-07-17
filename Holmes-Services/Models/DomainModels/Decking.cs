@@ -53,9 +53,10 @@ namespace Holmes_Services.Models.DomainModels
         [MaxLength(255, ErrorMessage = "Image must be 255 characters or less")]
         public string Image { get; set; }
 
-        // nav property
+        // nav properties
         public ICollection<Design> Designs { get; set; }
-
+        public ICollection<Idea> Ideas { get; set; }
+        // non nav
         public string Slug() => Product_Code + "-" + Name;
 
         public string GetFormattedPrice()

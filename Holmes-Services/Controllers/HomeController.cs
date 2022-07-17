@@ -35,7 +35,18 @@ namespace Holmes_Services.Controllers
             };    
             return View(customersViewModel);
         }
+        public IActionResult Contact()
+        {
+            return View();
+        }
+        public IActionResult Ideas()
+        {
 
+        }
+        public IActionResult Portfollio()
+        {
+
+        }
         public IActionResult Privacy()
         {
             return View();

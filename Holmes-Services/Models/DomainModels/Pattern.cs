@@ -15,7 +15,9 @@ namespace Holmes_Services.Models.DomainModels
         [MaxLength(50, ErrorMessage = "Shape must be 50 characters or less")]
         public string Shape { get; set; }
 
-        public IQueryable<Design> Designs { get; set; }
+        // nav properties
+        public ICollection<Design> Designs { get; set; }
+        public ICollection<Idea> Ideas { get; set; } 
 
     }
 }
