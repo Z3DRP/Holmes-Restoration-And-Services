@@ -104,6 +104,26 @@ namespace Holmes_Services.Models.Repositories
                 return jobData;
             }
         }
+        private Repo<Idea> ideaData;
+        public Repo<Idea> Ideas
+        {
+            get
+            {
+                if (ideaData == null)
+                    ideaData = new Repo<Idea>(_contxt);
+                return ideaData;
+            }
+        }
+        private Repo<CompletedJob> completeData;
+        public Repo<CompletedJob> CompletedJobs
+        {
+            get
+            {
+                if (completeData == null)
+                    completeData = new Repo<CompletedJob>(_contxt);
+                return completeData;
+            }
+        }
 
         public void DeleteCustomerDesigns(Customer customer)
         {
@@ -115,13 +135,19 @@ namespace Holmes_Services.Models.Repositories
             foreach(Design customerDesign in customerDesigns)
                 Designs.Delete(customerDesign);
         }
-        
-        public void AddNewDesign(Design design)
+        public void DeleteCustomerJobs(Customer customer)
         {
-            Designs.Insert(design);
-            
-        }
+            var customerJobs = Jobs.List(new QueryOptions<Job>
+            {
+                Where = ci => ci.Customer_Id == customer.Id
+            });
 
+            foreach (Job job in customerJobs)
+                Jobs.Delete(job);
+        }
+        public void AddNewDesign(Design design) => Designs.Insert(design);
+        public void AddNewJob(Job job) => Jobs.Insert(job);
+        public void DeleteJob(Job job) => Jobs.Delete(job);
         public void Save() => _contxt.SaveChanges();
 
     }

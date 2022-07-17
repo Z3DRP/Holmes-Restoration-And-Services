@@ -6,7 +6,7 @@ namespace Holmes_Services.Models.DomainModels
     public class Idea
     {
         [Required(ErrorMessage = "Id is required")]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Decking Id required")]
         [Range(0, int.MaxValue, ErrorMessage = "Id must be a positive number")]

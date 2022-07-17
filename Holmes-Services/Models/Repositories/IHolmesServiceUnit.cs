@@ -13,5 +13,7 @@ namespace Holmes_Services.Models.Repositories
         Repo<Price_Groups> Groups { get; }
         Repo<Design> Designs { get; }
         Repo<Job> Jobs { get; }
+        Repo<Idea> Ideas { get; }
+        Repo<CompletedJob> CompletedJobs { get; }
     }
 }

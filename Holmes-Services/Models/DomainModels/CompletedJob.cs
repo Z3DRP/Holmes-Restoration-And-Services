@@ -17,6 +17,9 @@ namespace Holmes_Services.Models.DomainModels
         [Required(ErrorMessage = "Completion date required")]
         [DataType(DataType.Date, ErrorMessage = "Completion date must be a valid date")]
         public DateTime Completioin_Date { get; set; }
+
+        [Required(ErrorMessage = "Final image is required")]
+        public string Image { get; set; }
         
 
     }
