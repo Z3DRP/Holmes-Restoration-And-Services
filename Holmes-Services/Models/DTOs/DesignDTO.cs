@@ -19,7 +19,7 @@ namespace Holmes_Services.Models.DTOs
             RailId = design.Railing_Id;
             Length = design.Length;
             Width = design.Width;
-            PatternId = design.PatternId;
+            PatternId = design.Pattern_Id;
             Estimate = design.Estimate;
         }
     }

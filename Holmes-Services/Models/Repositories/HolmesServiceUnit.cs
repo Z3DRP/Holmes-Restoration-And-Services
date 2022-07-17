@@ -63,7 +63,7 @@ namespace Holmes_Services.Models.Repositories
             }
         }
         private Repo<Pattern> patternData;
-        public Repo<Pattern> PatternType
+        public Repo<Pattern> Patterns
         {
             get
             {
