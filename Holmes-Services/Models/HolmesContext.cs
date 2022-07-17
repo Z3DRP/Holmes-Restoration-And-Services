@@ -16,6 +16,7 @@ namespace Holmes_Services.Models
         public DbSet<Railing> Railings { get; set; }
         public DbSet<Design> Designs { get; set; }
         public DbSet<Job> Jobs { get; set; }
+        public DbSet<Pattern> Patterns { get; set; }
 
 
 
@@ -43,6 +44,8 @@ namespace Holmes_Services.Models
             model.Entity<Rail_Type>().HasMany(rt => rt.Railings)
                 .WithOne(r => r.Type).HasForeignKey(r => r.Type_Id)
                 .HasPrincipalKey(rt => rt.Type_Code);
+
+            model.Entity<Pattern>().HasKey(p => new { p.Id });
 
             //model.Entity<Rail_Type>().HasOne(r => r.Type)
             //    .WithOne().HasForeignKey(rt => rt.Type_Id)
@@ -90,6 +93,9 @@ namespace Holmes_Services.Models
 
             model.Entity<Design>().HasOne(r => r.Rail)
                 .WithMany(r => r.Designs).HasForeignKey(r => r.Railing_Id);
+
+            model.Entity<Design>().HasOne(p => p.Pattern)
+                .WithMany(d => d.Designs).HasForeignKey(p => p.Pattern_Id);
 
             //jobs
             model.Entity<Job>().HasKey(j => new { j.Id });

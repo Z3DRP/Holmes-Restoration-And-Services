@@ -49,8 +49,8 @@ namespace Holmes_Services.Models.DomainModels
         [Required(ErrorMessage = "Pattern is required")]
         [Range(0, int.MaxValue, ErrorMessage = "Id must be a positive number")]
         //navigational property - fk
-        [ForeignKey(nameof(Pattern))]
-        public int PatternId { get; set; }
+        public int Pattern_Id { get; set; }
+        [ForeignKey(nameof(Pattern_Id))]
         public Pattern Pattern { get; set; }
 
         [Required(ErrorMessage = "Estimate required")]
