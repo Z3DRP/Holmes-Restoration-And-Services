@@ -62,7 +62,16 @@ namespace Holmes_Services.Models.Repositories
                 return deckTypeData;
             }
         }
-
+        private Repo<Pattern> patternData;
+        public Repo<Pattern> PatternType
+        {
+            get
+            {
+                if (patternData == null)
+                    patternData = new Repo<Pattern>(_contxt);
+                return patternData;
+            }
+        }
         private Repo<Price_Groups> priceGroups;
         public Repo<Price_Groups> Groups
         {

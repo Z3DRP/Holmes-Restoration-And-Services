@@ -46,6 +46,12 @@ namespace Holmes_Services.Models.DomainModels
         [Required(ErrorMessage = "Square feet is required")]
         public double Square_Ft { get => this.Square_Ft; set => CalcSquareFeet(); }
 
+        [Required(ErrorMessage = "Pattern is required")]
+        [Range(0, int.MaxValue, ErrorMessage = "Id must be a positive number")]
+        //navigational property - fk
+        [ForeignKey(nameof(Pattern))]
+        public int PatternId { get; set; }
+        public Pattern Pattern { get; set; }
 
         [Required(ErrorMessage = "Estimate required")]
         public double Estimate { get => this.Estimate; set => CalcEstimate(); }

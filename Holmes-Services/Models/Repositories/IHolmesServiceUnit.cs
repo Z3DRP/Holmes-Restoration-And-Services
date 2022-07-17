@@ -9,6 +9,7 @@ namespace Holmes_Services.Models.Repositories
         Repo<Railing> Rails { get;}
         Repo<Rail_Type> RailTypes { get; }
         Repo<Deck_Type> DeckTypes { get;  }
+        Repo<Pattern> Patterns { get; }
         Repo<Price_Groups> Groups { get; }
         Repo<Design> Designs { get; }
         Repo<Job> Jobs { get; }

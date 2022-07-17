@@ -11,7 +11,7 @@ namespace Holmes_Services.Models.Extensions
         public static T GetObject<T>(this ISession session, string key)
         {
             var value = session.GetString(key);
-            return value == null ? default(T) : JsonConvert.DeserializeObject<T>(value);
+            return (string.IsNullOrEmpty(value)) ? default(T) : JsonConvert.DeserializeObject<T>(value);
         }
     }
 }
