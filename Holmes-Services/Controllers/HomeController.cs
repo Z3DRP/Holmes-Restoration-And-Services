@@ -79,6 +79,7 @@ namespace Holmes_Services.Controllers
             }
 
             return View(portfollioDTOs);
+
         }
         public IActionResult Privacy()
         {
