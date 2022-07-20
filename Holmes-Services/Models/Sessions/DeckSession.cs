@@ -38,7 +38,7 @@ namespace Holmes_Services.Models.Sessions
             {
                 Decking deck = data.Get(new QueryOptions<Decking>
                 {
-                    Includes = "Types.Type, Groups.Group_Name",
+                    Includes = "Types.Type, Group.Group_Name",
                     Where = d => d.Id == storedDeck.DeckId
                 });
                 if (deck != null)

@@ -9,7 +9,7 @@ namespace Holmes_Services.Models.DomainModels
 
         [Required(ErrorMessage = "Name is requried")]
         [MaxLength(75, ErrorMessage = "Name must be 75 characters or less")]
-        public int Name { get; set; }
+        public string Name { get; set; }
 
         [Required(ErrorMessage = "Shape is required")]
         [MaxLength(50, ErrorMessage = "Shape must be 50 characters or less")]

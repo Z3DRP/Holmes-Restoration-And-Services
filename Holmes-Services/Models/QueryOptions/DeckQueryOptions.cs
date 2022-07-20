@@ -6,7 +6,7 @@ namespace Holmes_Services.Models.QueryOptions
     public class DeckQueryOptions : QueryOptions<Decking>
     {
         public enum PriceGroups { A, B, C }
-
+        
         public void SortFilter(DeckingGridBuilder builder)
         {
             // filter
@@ -23,7 +23,7 @@ namespace Holmes_Services.Models.QueryOptions
             }
             
             // sort
-            if (builder.IsSortedByByType)
+            if (builder.IsSortedByType)
                 OrderBy = t => t.Type;
             else if (builder.IsSortedByGroup)
                 OrderBy = g => g.Group;

@@ -5,9 +5,16 @@ namespace Holmes_Services.Models.RouteDictionaries
 {
     public static class FilterPrefix
     {
+        public const string DefaultFilter = "all";
         public const string Type = "type-";
         public const string Price = "price-";
         public const string Group = "group-";
+        public const string RailGroup = "rail-group-";
+        public const string DeckGroup = "deck-group-";
+        public const string Pattern = "pattern-";
+        public const string StartDate = "startdate-";
+        public const string Deck = "deck-";
+        public const string Rail = "rail-";
     }
 
     public class RouteDictionary : Dictionary<string, string>
@@ -69,8 +76,44 @@ namespace Holmes_Services.Models.RouteDictionaries
             get => Get(nameof(RailingGridDTO.Price))?.Replace(FilterPrefix.Price, "");
             set => this[nameof(RailingGridDTO.Price)] = value;
         }
+        public string DesignPatternFilter
+        {
+            get => Get(nameof(DesignGridDTO.Pattern))?.Replace(FilterPrefix.Pattern, "");
+            set => this[nameof(DesignGridDTO.Pattern)] = value;
+        }
+        public string DesignPriceFilter
+        {
+            get => Get(nameof(DesignGridDTO.Price))?.Replace(FilterPrefix.Price, "");
+            set => this[nameof(DesignGridDTO.Price)] = value;
+        }
+        public string DesignDeckGroupFilter
+        {
+            get => Get(nameof(DesignGridDTO.DeckGroup))?.Replace(FilterPrefix.DeckGroup, "");
+            set => this[nameof(DesignGridDTO.DeckGroup)] = value;
+        }
+        public string DesignRailGroupFilter
+        {
+            get => Get(nameof(DesignGridDTO.RailGroup))?.Replace(FilterPrefix.RailGroup, "");
+            set => this[nameof(DesignGridDTO.RailGroup)] = value;
+        }
+        public string DesignStartDateFilter
+        {
+            get => Get(nameof(DesignGridDTO.StartDate))?.Replace(FilterPrefix.StartDate, "");
+            set => this[nameof(DesignGridDTO.StartDate)] = value;
+        }
+        public string DesignDeckFilter 
+        {
+            get => Get(nameof(DesignGridDTO.Deck))?.Replace(FilterPrefix.Deck, "");
+            set => this[nameof(DesignGridDTO.Deck)] = value;
+        }
+        public string DesignRailFitler
+        {
+            get => Get(nameof(DesignGridDTO.Rail))?.Replace(FilterPrefix.Rail, "");
+            set => this[nameof(DesignGridDTO.Rail)] = value;
+        }
         public void ClearFilters() =>
-            DeckTypeFilter = RailTypeFilter = DeckPriceFilter = RailPriceFilter = RailingGridDTO.DefaultFilter;
+            DeckTypeFilter = RailTypeFilter = DeckPriceFilter = RailPriceFilter = DeckGroupFilter = RailGroupFilter = FilterPrefix.DefaultFilter;
+        public void ClearDesignFilters() => DesignPriceFilter = DesignPatternFilter = DesignDeckGroupFilter = DesignRailGroupFilter = DesignStartDateFilter = DesignDeckFilter = DesignRailFitler = FilterPrefix.DefaultFilter;
 
         private string Get(string key) => Keys.Contains(key) ? this[key] : null;
 

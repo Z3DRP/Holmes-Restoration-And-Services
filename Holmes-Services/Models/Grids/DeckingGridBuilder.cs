@@ -27,11 +27,7 @@ namespace Holmes_Services.Models.Grids
         // to each one 
         public void LoadFilterSegments(string[] filter, Deck_Type type)
         {
-            if (type == null)
-                routes.DeckTypeFilter = FilterPrefix.Type + filter[0];
-            else
-                routes.DeckTypeFilter = FilterPrefix.Type + filter[0]
-                    + "-" + type.Type.Slug();
+            routes.DeckTypeFilter = FilterPrefix.Type + filter[0];
             routes.DeckPriceFilter = FilterPrefix.Price + filter[1];
             routes.DeckGroupFilter = FilterPrefix.Group + filter[2];
         }
@@ -43,7 +39,7 @@ namespace Holmes_Services.Models.Grids
         public bool IsFilteredByPrice => routes.DeckPriceFilter != def;
         public bool IsFilteredByGroup => routes.DeckGroupFilter != def;
         // sort flags
-        public bool IsSortedByByType => routes.SortField.EqualsNoCase(nameof(Decking.Type));
+        public bool IsSortedByType => routes.SortField.EqualsNoCase(nameof(Decking.Type));
         public bool IsSortedByPrice => routes.SortField.EqualsNoCase(nameof(Decking.Price_Per_SqFt));
         public bool IsSortedByGroup => routes.SortField.EqualsNoCase(nameof(Decking.Group));
     }
