@@ -5,6 +5,7 @@ using Holmes_Services.Models.Extensions;
 using Holmes_Services.Models.Grids;
 using Holmes_Services.Models.QueryOptions;
 using Holmes_Services.Models.Repositories;
+using Holmes_Services.Models.Sessions;
 using Holmes_Services.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +14,21 @@ namespace Holmes_Services.Controllers
     public class DeckingController : Controller
     {
         private HolmesServiceUnit data { get; set; }
-        public DeckingController(HolmesContext ctx) => data = new HolmesServiceUnit(ctx);
+        private Repo<Decking> Ctx { get; set; }
+        public DeckingController(HolmesContext ctx)
+        {
+            data = new HolmesServiceUnit(ctx);
+            Ctx = new Repo<Decking>(ctx);
+        }
         public IActionResult Index()
         {
             return View();
+        }
+        private DeckSession GetDecking()
+        {
+            var deck = new DeckSession(HttpContext);
+            deck.Load(Ctx);
+            return deck;
         }
         public ViewResult List(DeckingGridDTO decks)
         {
@@ -98,6 +110,83 @@ namespace Holmes_Services.Controllers
 
             return RedirectToAction("List", builder.CurrentRoute);
         }
-       
+        [HttpPost]
+        public RedirectToActionResult Add(int id)
+        {
+            Decking deck = Ctx.Get(new QueryOptions<Decking>
+            {
+                Includes = "Type.Type, Group.Group_Name ",
+                Where = d => d.Id == id
+            });
+
+            if (deck == null)
+                TempData["message"] = "Unable to add deck";
+            else
+            {
+                DeckDTO ddto = new DeckDTO();
+                ddto.Load(deck);
+                DeckItem ditem = new DeckItem
+                {
+                    Deck = ddto,
+                    Price = ddto.Price
+                };
+
+                DeckSession dsesh = GetDecking();
+                dsesh.Add(ditem);
+                dsesh.Save();
+
+                TempData["message"] = $"{deck.Name} added to design";
+            }
+            var builder = new DeckingGridBuilder(HttpContext.Session);
+            return RedirectToAction("List", "Deck", builder.CurrentRoute);
+        }
+        [HttpPost]
+        public RedirectToActionResult Remove(int id)
+        {
+            DeckSession dsesh = GetDecking();
+            DeckItem? ditem = dsesh.GetById(id);
+            if (ditem != null)
+            {
+                dsesh.Remove(ditem);
+                dsesh.Save();
+            }
+            TempData["message"] = $"{ditem.Deck.Name} removed from design";
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public RedirectToActionResult Clear()
+        {
+            DeckSession dsesh = GetDecking();
+            dsesh.Clear();
+            dsesh.Save();
+
+            TempData["message"] = "Design cleared";
+            return RedirectToAction("Index");
+        }
+        public IActionResult Edit(int id)
+        {
+            DeckSession dsesh = GetDecking();
+            DeckItem ditem = dsesh.GetById(id);
+            if (ditem == null)
+            {
+                TempData["message"] = "Unable to locate decking";
+                return RedirectToAction("List");
+            }
+            else
+            {
+                return View(ditem);
+            }
+        }
+        [HttpPost]
+        public RedirectToActionResult Edit(DeckItem deckItem)
+        {
+            DeckSession dsesh = GetDecking();
+            dsesh.Edit(deckItem);
+            dsesh.Save();
+
+            TempData["message"] = $"{deckItem.Deck.Name} updated";
+            return RedirectToAction("Index");
+        }
+        public ViewResult Checkout() => View();
     }
 }

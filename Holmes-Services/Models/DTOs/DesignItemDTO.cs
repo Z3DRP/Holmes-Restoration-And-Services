@@ -2,10 +2,7 @@
 {
     public class DesignItemDTO
     {
-        public int DesignID { get; set; }
-        public int DeckId { get; set; }
-        public int RailId { get; set; }
-        public int PatternId { get; set; }
-        public double Estimate { get; set; }
+        public int Item_Id { get; set; }
+        public double Price { get; set; }
     }
 }

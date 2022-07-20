@@ -1,5 +1,6 @@
 ﻿using Holmes_Services.Models.DomainModels;
 using Holmes_Services.Models.DTOs;
+using System.Collections.Generic;
 
 namespace Holmes_Services.Models.ModelListExtensions
 {
@@ -9,7 +10,7 @@ namespace Holmes_Services.Models.ModelListExtensions
             list.Select(d => new DeckItemDTO
             {
                 DeckId = d.Deck.DeckId,
-                Price = d.Deck.Price
+                Price = d.Price
             }).ToList();
     }
 }
