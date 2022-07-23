@@ -9,6 +9,6 @@ namespace Holmes_Services.Models.ViewModels
         public RouteDictionary CurrentRoute { get; set; }
         public int TotalPages { get; set; }
         // data for filter drop-downs 
-        public Customer Customer { get; set; }
+
     }
 }

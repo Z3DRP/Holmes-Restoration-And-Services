@@ -149,8 +149,8 @@ namespace Holmes_Services.Controllers
             {
                 dsesh.Remove(ditem);
                 dsesh.Save();
+                TempData["message"] = $"{ditem.Deck.Name} removed from design";
             }
-            TempData["message"] = $"{ditem.Deck.Name} removed from design";
             return RedirectToAction("Index");
         }
         [HttpPost]
