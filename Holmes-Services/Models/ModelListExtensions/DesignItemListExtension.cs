@@ -8,10 +8,8 @@ namespace Holmes_Services.Models.ModelListExtensions
         public static List<DesignItemDTO> ToDTO(this List<DesignItem> list) =>
             list.Select(d => new DesignItemDTO
             {
-                DesignID = d.DesignId,
-                DeckId = d.Deck.Id,
-                RailId = d.Rail.Id,
-                Estimate = d.Price
+                Id = d.Design.DesignId,
+                Price = d.Design.Estimate
             }).ToList();
     }
 }

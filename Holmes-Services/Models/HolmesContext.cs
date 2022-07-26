@@ -1,5 +1,7 @@
 ﻿using Holmes_Services.Models.DomainModels;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Holmes_Services.Models
 {
@@ -19,8 +21,6 @@ namespace Holmes_Services.Models
         public DbSet<Pattern> Patterns { get; set; }
         public DbSet<Idea> Ideas { get; set; }
         public DbSet<CompletedJob> CompletedJobs { get; set; }
-
-
 
         protected override void OnModelCreating(ModelBuilder model)
         {

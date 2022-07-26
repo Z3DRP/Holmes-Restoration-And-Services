@@ -21,19 +21,18 @@ namespace Holmes_Services.Controllers
             Ctx = ctx;
         }
 
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
         public IActionResult Index()
+        {
+            return View();
+        }
+        public IActionResult Customer()
         {
             var customers = Ctx.Customers.OrderBy(c => c.Id);
             var customersViewModel = new CustomerListViewModel
             {
                 Customers = Ctx.Customers.OrderBy(c => c.Id)
 
-            };    
+            };
             return View(customersViewModel);
         }
         public IActionResult Contact()

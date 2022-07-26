@@ -38,7 +38,7 @@ namespace Holmes_Services.Controllers
             // create a DeckQueryOption object to build a query expression for a page of data
             var options = new DeckQueryOptions
             {
-                Includes = "Type.Type, Group.Group_Name",
+               //Includes = "Type.Type, Group.Group_Name",
                 OrderByDirection = builder.CurrentRoute.SortDirection,
                 PageNumber = builder.CurrentRoute.PageNumber,
                 PageSize = builder.CurrentRoute.PageSize

@@ -1,6 +1,9 @@
 using Holmes_Services.Models;
 using Microsoft.EntityFrameworkCore; 
 using Newtonsoft.Json;
+using MySql.Data.MySqlClient;
+using MySql.Data.Types;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,12 +18,13 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 builder.Services.AddControllersWithViews().AddNewtonsoftJson();
-
 builder.Services.AddDbContext<HolmesContext>(options =>
-options.UseMySQL(connection)
-.LogTo(Console.WriteLine, LogLevel.Information)
-.EnableSensitiveDataLogging()
-.EnableDetailedErrors());
+{
+options.UseMySql(connection, ServerVersion.AutoDetect(connection),
+    mySqlOptions => mySqlOptions.EnableRetryOnFailure(
+        maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null)
+);
+});
 
 var app = builder.Build();
 
@@ -36,7 +40,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthorization();
 
 
