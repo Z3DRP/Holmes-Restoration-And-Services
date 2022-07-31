@@ -3,6 +3,5 @@
     public class RailItemDTO
     {
         public int RailId { get; set; }
-        public double Price { get; set; }
     }
 }

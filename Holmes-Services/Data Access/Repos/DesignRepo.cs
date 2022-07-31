@@ -5,12 +5,12 @@ using Dapper;
 
 namespace Holmes_Services.Data_Access.Repos
 {
-    public class DesignRepo : IDesignRepo
+    public static class DesignRepo
     {
-        private string _con = DbConnector.GetConnection();
-        private IEnumerable<Design> _designs;
+        private static string _con = DbConnector.GetConnection();
+        private static IEnumerable<Design>? _designs;
 
-        public IEnumerable<Design> GetAllDesigns()
+        public static IEnumerable<Design> GetAllDesigns()
         {
             string procedure = "[sp_GetDesigns]";
             InitDesigns();
@@ -23,7 +23,7 @@ namespace Holmes_Services.Data_Access.Repos
             return _designs == null ? Enumerable.Empty<Design>() : _designs;
         }
 
-        public IEnumerable<Design> GetCustomerDesigns(int customerId)
+        public static IEnumerable<Design> GetCustomerDesigns(int customerId)
         {
             string procedure = "[sp_GetDesignsByCustomer]";
             var parameter = new { customerID = customerId };
@@ -37,20 +37,20 @@ namespace Holmes_Services.Data_Access.Repos
             return _designs == null ? Enumerable.Empty<Design>() : _designs;
         }
 
-        public IEnumerable<Design> GetDesign(int id)
+        public static Design GetDesignById(int id)
         {
             string procedure = "[sp_GetDesign]";
             var parameter = new { Id = id };
-            InitDesigns();
+            Design? design = new Design();
 
             using (IDbConnection db = new MySqlConnection(_con))
             {
-                _designs = db.Query<Design>(procedure, parameter, commandType: CommandType.StoredProcedure).ToList();
+                design = db.QuerySingle<Design>(procedure, parameter, commandType: CommandType.StoredProcedure);
             }
 
-            return _designs == null ? Enumerable.Empty<Design>() : _designs;
+            return design == null ? design : design;
         }
-        public bool AddDesign(Design design)
+        public static bool AddDesign(Design design)
         {
             string procedure = "[sp_AddDesign]";
             int rowsAffected = 0;
@@ -75,7 +75,7 @@ namespace Holmes_Services.Data_Access.Repos
             return rowsAffected > 0 ? true : false;
         }
 
-        public bool UpdateDesign(Design design)
+        public static bool UpdateDesign(Design design)
         {
             string procedure = "[sp_UpdateDesign]";
             int rowsAffected;
@@ -100,7 +100,7 @@ namespace Holmes_Services.Data_Access.Repos
             return rowsAffected > 0 ? true : false;
         }
 
-        public bool DeleteDesign(int id)
+        public static bool DeleteDesign(int id)
         {
             string procedure = "[sp_DeleteDesign]";
             var parameter = new { id = id };
@@ -114,7 +114,7 @@ namespace Holmes_Services.Data_Access.Repos
             return rowsAffected > 0 ? true : false;
         }
 
-        public bool VerifyCustomerDesign(int customerID, int deckID, int railID)
+        public static bool VerifyCustomerDesign(int customerID, int deckID, int railID)
         {
             string procedure = "[sp_verify_design]";
             var parameters = new {customerId = customerID, deckId = deckID, railId = railID};
@@ -127,6 +127,20 @@ namespace Holmes_Services.Data_Access.Repos
 
             return doesExist;
         }
-        private void InitDesigns() => _designs = new List<Design>();
+
+        public static bool VerifyDesignById(int id)
+        {
+            string procedure = "[sp_verify_design_byId]";
+            var parameters = new {designID = id};
+            bool doesExist;
+
+            using (IDbConnection db = new MySqlConnection(_con))
+            {
+                doesExist = db.ExecuteScalar<bool>(procedure, parameters, commandType: CommandType.StoredProcedure);
+            }
+
+            return doesExist;
+        }
+        private static void InitDesigns() => _designs = new List<Design>();
     }
 }

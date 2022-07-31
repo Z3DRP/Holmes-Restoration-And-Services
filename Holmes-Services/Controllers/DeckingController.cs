@@ -8,6 +8,7 @@ using Holmes_Services.Models.Repositories;
 using Holmes_Services.Models.Sessions;
 using Holmes_Services.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Holmes_Services.Data_Access.Repos;
 
 namespace Holmes_Services.Controllers
 {
@@ -32,74 +33,16 @@ namespace Holmes_Services.Controllers
         }
         public ViewResult List(DeckingGridDTO decks)
         {
-            // get grid builder which loads route segment values and stores them in session
-            var builder = new DeckingGridBuilder(HttpContext.Session, decks, defaultSortField: nameof(Decking.Name));
+            IEnumerable<Decking> deckings = DeckRepo.GetAllDecks();
 
-            // create a DeckQueryOption object to build a query expression for a page of data
-            var options = new DeckQueryOptions
-            {
-               //Includes = "Type.Type, Group.Group_Name",
-                OrderByDirection = builder.CurrentRoute.SortDirection,
-                PageNumber = builder.CurrentRoute.PageNumber,
-                PageSize = builder.CurrentRoute.PageSize
-            };
-
-            // call the SortFilter method of the DeckQueryOpt object and pass it the builder
-            // object it uses the route information and the properties of the builder object to
-            // add sort and filter options to the query expression
-            options.SortFilter(builder);
-
-            // creat view model and add page of book data, data for drop downs
-            // the current route and the total number of pages
-            var vm = new DeckListViewModel
-            {
-                Decks = data.Decks.List(options),
-                Types = data.DeckTypes.List(new QueryOptions<Deck_Type>
-                {
-                    OrderBy = t => t.Type
-                }),
-                Groups = data.Groups.List(new QueryOptions<Price_Groups>
-                {
-                    OrderBy = g => g.Group_Name
-                }),
-                CurrentRoute = builder.CurrentRoute,
-                TotalPages = builder.GetTotalPages(data.Decks.Count)
-            };
-
-            return View(vm);
+            return deckings == null ? View(Enumerable.Empty<Decking>()) : View(deckings);
         }
         public ViewResult Details(int id)
         {
-            var deck = data.Decks.Get(new QueryOptions<Decking>
-            {
-                Includes = "Type.Type, Group.Group_Name",
-                Where = d => d.Id == id
-            });
-
-            return View(deck);
+            Decking deck = DeckRepo.GetDeckById(id);
+            return deck == null ? View(Enumerable.Empty<Decking>()) : View(deck);
         }
 
-        [HttpPost]
-        public RedirectToActionResult Filter(string[] filter, bool clear = false)
-        {
-            // get current route segments from session
-            var builder = new DeckingGridBuilder(HttpContext.Session);
-
-            // clear or update filter route segment values if update get author data
-            // type slug to type filter value
-            if (clear)
-                builder.ClearFilterSegments();
-            else
-            {
-                var type = data.DeckTypes.Get(filter[0].ToInt());
-                builder.CurrentRoute.PageNumber = 1;
-                builder.LoadFilterSegments(filter, type);
-            }
-            // save route data back to session and redirect to tdeck list action method
-            // passing dictionary of route segment values to build URL
-            builder.SaveRouteSegments();
-            return RedirectToAction("List", builder.CurrentRoute);
-        }
         [HttpPost]
         public RedirectToActionResult PageSize(int pagesize)
         {
@@ -113,16 +56,12 @@ namespace Holmes_Services.Controllers
         [HttpPost]
         public RedirectToActionResult Add(int id)
         {
-            Decking deck = Ctx.Get(new QueryOptions<Decking>
-            {
-                Includes = "Type.Type, Group.Group_Name ",
-                Where = d => d.Id == id
-            });
+            Decking deck = DeckRepo.GetDeckById(id);
 
             if (deck == null)
                 TempData["message"] = "Unable to add deck";
             else
-            {
+            {    
                 DeckDTO ddto = new DeckDTO();
                 ddto.Load(deck);
                 DeckItem ditem = new DeckItem
@@ -132,14 +71,20 @@ namespace Holmes_Services.Controllers
                 };
 
                 DeckSession dsesh = GetDecking();
-                dsesh.Add(ditem);
-                dsesh.Save();
 
-                TempData["message"] = $"{deck.Name} added to design";
+                if (dsesh.Count > 0)
+                    return RedirectToAction("Edit", ditem);
+                else
+                {
+                    dsesh.Add(ditem);
+                    dsesh.Save();
+                    TempData["message"] = $"{deck.Name} added to design";
+                }
             }
-            var builder = new DeckingGridBuilder(HttpContext.Session);
-            return RedirectToAction("List", "Deck", builder.CurrentRoute);
+
+            return RedirectToAction("List");
         }
+
         [HttpPost]
         public RedirectToActionResult Remove(int id)
         {
@@ -151,8 +96,12 @@ namespace Holmes_Services.Controllers
                 dsesh.Save();
                 TempData["message"] = $"{ditem.Deck.Name} removed from design";
             }
-            return RedirectToAction("Index");
+            else
+                TempData["message"] = "Unable to remove decking from design";
+
+            return RedirectToAction("List");
         }
+
         [HttpPost]
         public RedirectToActionResult Clear()
         {
@@ -166,7 +115,7 @@ namespace Holmes_Services.Controllers
         public IActionResult Edit(int id)
         {
             DeckSession dsesh = GetDecking();
-            DeckItem ditem = dsesh.GetById(id);
+            DeckItem? ditem = dsesh.GetById(id);
             if (ditem == null)
             {
                 TempData["message"] = "Unable to locate decking";

@@ -5,13 +5,13 @@ using Dapper;
 
 namespace Holmes_Services.Data_Access.Repos
 {
-    public class JobRepo : IJobRepo
+    public static class JobRepo
     {
-        private string _con = DbConnector.GetConnection();
-        private IEnumerable<Job> _jobs;
+        private static string _con = DbConnector.GetConnection();
+        private static IEnumerable<Job>? _jobs;
 
-        public IEnumerable<Job> GetAllJobs(int cId)
-        {
+        public static IEnumerable<Job> GetAllJobs(int cId)
+        { 
             string procedure = "[sp_GetJobs]";
             InitJobs();
 
@@ -23,7 +23,7 @@ namespace Holmes_Services.Data_Access.Repos
             return _jobs == null ? Enumerable.Empty<Job>() : _jobs;
         }
 
-        public IEnumerable<Job> GetJob(int jobId)
+        public static IEnumerable<Job> GetJob(int jobId)
         {
             string procedure = "[sp_GetJob]";
             var parameter = new { id = jobId };
@@ -37,7 +37,7 @@ namespace Holmes_Services.Data_Access.Repos
             return _jobs == null ? Enumerable.Empty<Job>() : _jobs;
         }
 
-        public IEnumerable<Job> GetCustomerJobs(int id)
+        public static IEnumerable<Job> GetCustomerJobs(int id)
         {
             string procedure = "[sp_GetCustomerJobs]";
             var parameter = new { customerId = id };
@@ -51,7 +51,7 @@ namespace Holmes_Services.Data_Access.Repos
             return _jobs == null ? Enumerable.Empty<Job>() : _jobs;
         }
 
-        public bool AddJob(Job job)
+        public static bool AddJob(Job job)
         {
             string procedure = "[sp_AddJob]";
             int rowsAffected = 0;
@@ -69,7 +69,7 @@ namespace Holmes_Services.Data_Access.Repos
             return rowsAffected > 0 ? true : false;
         }
 
-        public bool UpdateJob(Job job)
+        public static bool UpdateJob(Job job)
         {
             string procedure = "[sp_UpdateJob]";
             int rowsAffected = 0;
@@ -88,7 +88,7 @@ namespace Holmes_Services.Data_Access.Repos
             return rowsAffected > 0 ? true : false;
         }
 
-        public bool DeleteJob(int id)
+        public static bool DeleteJob(int id)
         {
             string procedure = "[sp_DeleteJob]";
             var parameter = new { id = id };
@@ -102,7 +102,7 @@ namespace Holmes_Services.Data_Access.Repos
             return rowsAffected > 0 ? true : false;
         }
 
-        public bool VerifyJob(int customerID, int designID)
+        public static bool VerifyJob(int customerID, int designID)
         {
             string procedure = "[sp_verify_job]";
             var parameters = new {customerId = customerID, designId = designID };
@@ -115,6 +115,20 @@ namespace Holmes_Services.Data_Access.Repos
 
             return doesExist;
         }
-        public void InitJobs() => _jobs = new List<Job>();
+
+        public static bool VerifyJobById(int id)
+        {
+            string procedure = "[sp_verify_job_byId]";
+            var parameters = new { jobID = id };
+            bool doesExist;
+
+            using (IDbConnection db = new MySqlConnection(_con))
+            {
+                doesExist = db.ExecuteScalar<bool>(procedure, parameters, commandType: CommandType.StoredProcedure);
+            }
+
+            return doesExist;
+        }
+        public static void InitJobs() => _jobs = new List<Job>();
     }
 }

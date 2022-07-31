@@ -5,12 +5,12 @@ using System.Data;
 
 namespace Holmes_Services.Data_Access.Repos
 {
-    public class RailRepo : IRailRepo
+    public static class RailRepo
     {
-        private string _con = DbConnector.GetConnection();
-        IEnumerable<Railing> _railing;
+        private static string _con = DbConnector.GetConnection();
+        static IEnumerable<Railing> _railing;
 
-        public IEnumerable<Railing> GetAllRails()
+        public static IEnumerable<Railing> GetAllRails()
         {
             string procedure = "[sp_GetRailings]";
             _railing = new List<Railing>();
@@ -20,10 +20,10 @@ namespace Holmes_Services.Data_Access.Repos
                 _railing = db.Query<Railing>(procedure, commandType: CommandType.StoredProcedure).ToList();
             }
 
-            return _railing == null ? new List<Railing>() : _railing;
+            return _railing == null ? Enumerable.Empty<Railing>() : _railing;
         }
 
-        public IEnumerable<Railing> GetRailsByPrice(double price)
+        public static IEnumerable<Railing> GetRailsByPrice(double price)
         {
             string procedure = "[sp_get_rails_by_price]";
             var parameter = new { price = price };
@@ -34,24 +34,24 @@ namespace Holmes_Services.Data_Access.Repos
                 _railing = db.Query<Railing>(procedure, parameter, commandType: CommandType.StoredProcedure).ToList();
             }
 
-            return _railing == null ? new List<Railing>() : _railing;
+            return _railing == null ? Enumerable.Empty<Railing>() : _railing;
         }
 
-        public IEnumerable<Railing> GetRailById(int id)
+        public static Railing GetRailById(int id)
         {
             string procedure = "[sp_get_rails_by_id]";
             var parameter = new { id = id };
-            _railing = new List<Railing>();
+            Railing rail = new Railing();
 
             using (IDbConnection db = new MySqlConnection(_con))
             {
-                _railing = db.Query<Railing>(procedure, parameter, commandType: CommandType.StoredProcedure).ToList();
+                rail = db.QuerySingle<Railing>(procedure, parameter, commandType: CommandType.StoredProcedure);
             }
 
-            return _railing == null ? new List<Railing>() : _railing;
+            return rail == null ? new Railing() : rail;
         }
 
-        public IEnumerable<Railing> GetRailByGroup(int group)
+        public static IEnumerable<Railing> GetRailByGroup(int group)
         {
             string procedure = "[sp_get_rails_by_groupId]";
             var parameter = new { id = group };
@@ -62,10 +62,10 @@ namespace Holmes_Services.Data_Access.Repos
                 _railing = db.Query<Railing>(procedure, parameter, commandType: CommandType.StoredProcedure).ToList();
             }
 
-            return _railing == null ? new List<Railing>() : _railing;
+            return _railing == null ? Enumerable.Empty<Railing>() : _railing;
         }
 
-        public IEnumerable<Railing> GetRailByType(string type)
+        public static IEnumerable<Railing> GetRailByType(string type)
         {
             string procedure = "[sp_GetRailByType]";
             var parameter = new { type = type };
@@ -76,8 +76,35 @@ namespace Holmes_Services.Data_Access.Repos
                 _railing = db.Query<Railing>(procedure, parameter, commandType: CommandType.StoredProcedure).ToList();
             }
 
-            return _railing == null ? new List<Railing>() : _railing;
+            return _railing == null ? Enumerable.Empty<Railing>() : _railing;
         }
 
+        public static bool VerifyRailing(string pCode, string pName)
+        {
+            string procedure = "[sp_verify_rail]";
+            var parameters = new {productCode = pCode, name = pName};
+            bool doesExist;
+
+            using (IDbConnection db = new MySqlConnection(_con))
+            {
+                doesExist = db.ExecuteScalar<bool>(procedure, parameters, commandType: CommandType.StoredProcedure);
+            }
+
+            return doesExist;
+        }
+
+        public static bool VerifyRailingById(int id)
+        {
+            string procedure = "[sp_verify_rail_byId]";
+            var parameters = new { railID = id};
+            bool doesExist;
+
+            using (IDbConnection db = new MySqlConnection(_con))
+            {
+                doesExist = db.ExecuteScalar<bool>(procedure, parameters, commandType: CommandType.StoredProcedure);
+            }
+
+            return doesExist;
+        }
     }
 }

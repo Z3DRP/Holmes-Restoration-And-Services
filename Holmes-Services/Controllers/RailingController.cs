@@ -1,4 +1,5 @@
-﻿using Holmes_Services.Models;
+﻿using Holmes_Services.Data_Access.Repos;
+using Holmes_Services.Models;
 using Holmes_Services.Models.DomainModels;
 using Holmes_Services.Models.DTOs;
 using Holmes_Services.Models.Extensions;
@@ -31,46 +32,15 @@ namespace Holmes_Services.Controllers
             rail.Load(Ctx);
             return rail;
         }
-        public ViewResult List(RailingGridDTO rails)
+        public ViewResult List()
         {
-            var builder = new RailingGridBuilder(HttpContext.Session, rails, defaultSortField: nameof(Railing.Name));
-
-            var options = new RailQueryOptions
-            {
-                Includes = "Type.Type, Groups.Group_Name",
-                OrderByDirection = builder.CurrentRoute.SortDirection,
-                PageNumber = builder.CurrentRoute.PageNumber,
-                PageSize = builder.CurrentRoute.PageSize
-            };
-
-            options.SortFilter(builder);
-
-            var vm = new RailListViewModel
-            {
-                Rails = data.Rails.List(options),
-                Types = data.RailTypes.List(new QueryOptions<Rail_Type>
-                {
-                    OrderBy = r => r.Type
-                }),
-                Groups = data.Groups.List(new QueryOptions<Price_Groups>
-                {
-                    OrderBy = p => p.Group_Name
-                }),
-                CurrentRoute = builder.CurrentRoute,
-                TotalPages = builder.GetTotalPages(data.Rails.Count)
-            };
-
-            return View(vm);
+            IEnumerable<Railing> rails = RailRepo.GetAllRails();
+            return rails == null ? View(Enumerable.Empty<Railing>()) : View(rails);
         }
         public ViewResult Details(int id)
         {
-            var rail = data.Rails.Get(new QueryOptions<Railing>
-            {
-                Includes = "Type.Type, Groups.Group_Name",
-                Where = r => r.Id == id
-            });
-
-            return View(rail);
+            Railing rail = RailRepo.GetRailById(id);
+            return rail == null ? View(new Railing()) : View(rail);
         }
         [HttpPost]
         public RedirectToActionResult Filter(string[] filter, bool clear = false)
@@ -102,43 +72,53 @@ namespace Holmes_Services.Controllers
         [HttpPost]
         public RedirectToActionResult Add(int id)
         {
-            var rail = Ctx.Get(new QueryOptions<Railing>
-            {
-                Includes = "Type.Type, Group.Group_Name",
-                Where = r => r.Id == id
-            });
+            Railing rail = RailRepo.GetRailById(id);
+
             if (rail == null)
-                TempData["message"] = "Unable to add rail to design";
+                TempData["message"] = "Unable to add railing";
             else
             {
-                var rdto = new RailDTO();
+                RailDTO rdto = new RailDTO();
                 rdto.Load(rail);
-                RailItem railitem = new RailItem
+                RailItem ritem = new RailItem
                 {
                     Rail = rdto,
-                    Price = rdto.Price
+                    Price = rail.Price_Per_SqFt
                 };
 
-                RailSession rsesh = GetRailing();
-                rsesh.Add(railitem);
-                rsesh.Save();
-                TempData["message"] = $"{rail.Name} added to design";
+                RailSession rsession = GetRailing();
+
+                if (rsession.Count > 0)
+                    return RedirectToAction("Edit", ritem);
+                else
+                {
+                    rsession.Add(ritem);
+                    rsession.Save();
+                    TempData["message"] = $"{rail.Name} has been added";
+                }
             }
 
-            var builder = new RailingGridBuilder(HttpContext.Session);
-            return RedirectToAction("List", "Rail", builder.CurrentRoute);
+            return RedirectToAction("List");
         }
+
         [HttpPost]
         public RedirectToActionResult Remove(int id)
         {
             RailSession rsesh = GetRailing();
-            RailItem ritem = rsesh.GetById(id);
-            rsesh.Remove(ritem);
-            rsesh.Save();
+            RailItem? ritem = rsesh.GetById(id);
 
-            TempData["message"] = $"{ritem.Rail.Name} removed from design";
-            return RedirectToAction("Index");
+            if (ritem != null)
+            {
+                rsesh.Remove(ritem);
+                rsesh.Save();
+                TempData["message"] = $"{ritem.Rail.Name} removed from design";
+            }
+            else
+                TempData["message"] = $"Unable to remove railing from design";
+
+            return RedirectToAction("List");
         }
+
         [HttpPost]
         public RedirectToActionResult Clear()
         {
@@ -152,7 +132,7 @@ namespace Holmes_Services.Controllers
         public IActionResult Edit(int id)
         {
             RailSession rsesh = GetRailing();
-            RailItem ritem = rsesh.GetById(id);
+            RailItem? ritem = rsesh.GetById(id);
             if (ritem == null)
             {
                 TempData["message"] = "Unable to locate railing";

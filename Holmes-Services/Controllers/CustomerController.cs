@@ -1,4 +1,5 @@
-﻿using Holmes_Services.Models;
+﻿using Holmes_Services.Data_Access.Repos;
+using Holmes_Services.Models;
 using Holmes_Services.Models.DomainModels;
 using Holmes_Services.Models.DTOs;
 using Holmes_Services.Models.Extensions;
@@ -29,49 +30,19 @@ namespace Holmes_Services.Controllers
 
         public ViewResult List(GridDTO vals)
         {
-            string defaultSort = nameof(Customer.First_Name);
-            var builder = new GridBuilder(HttpContext.Session, vals, defaultSort);
-            builder.SaveRouteSegments();
-
-            var options = new QueryOptions<Customer>
-            {
-                Includes = "Designs.Id, Jobs.Id",
-                PageNumber = builder.CurrentRoute.PageNumber,
-                PageSize = builder.CurrentRoute.PageSize,
-                OrderByDirection = builder.CurrentRoute.SortDirection
-            };
-
-            if (builder.CurrentRoute.SortField.EqualsNoCase(defaultSort))
-                options.OrderBy = c => c.First_Name;
-            else
-                options.OrderBy = c => c.Last_Name;
-
-            var vm = new CustomerListViewModel
-            {
-                Customers = data.List(options),
-                CurrentRoute = builder.CurrentRoute,
-                TotalPages = builder.GetTotalPages(data.Count)
-            };
-
-            return View(vm);
+            IEnumerable<Customer> custoemrs = CustomerRepo.GetAllCustomers();
+            return custoemrs == null ? View(Enumerable.Empty<Customer>()) : View(custoemrs);
         }
 
         public IActionResult Details(int id)
         {
-            var customer = data.Get(new QueryOptions<Customer>
-            {
-                Where = c => c.Id == id
-            });
-
-            CustomerDTO cDTO = new CustomerDTO();
-            cDTO.Load(customer);
-
-            return View(cDTO);
+            Customer customer = CustomerRepo.GetCustomerById(id);
+            return customer == null ? View(new Customer()) : View(customer);
         }
+        [HttpGet]
         public IActionResult GetMyId(string firstname, string lastname)
         {
-            Customer customer = (Customer)hctx.Customers.Where(c => c.First_Name == firstname && c.Last_Name == lastname);
-
+            Customer customer = CustomerRepo.GetCustomerByName(firstname, lastname);
             // add id to the session and redirect to GetMyId page
             // need to implement 
             if (customer != null)
@@ -80,52 +51,31 @@ namespace Holmes_Services.Controllers
                 session.SetId(customer.Id);
                 session.SetFirstname(firstname);
                 session.SetLastname(lastname);
+                TempData["message"] = "Customer Id Found";
             }
+            else
+                TempData["message"] = $"Customer Id Not Found For {firstname} {lastname}, please try again later";
 
             return View(customer);
         }
 
         public IActionResult MyAccount(int id)
         {
-            var customer = data.Get(new QueryOptions<Customer>
-            {
-                Includes = "Designs.Id, Jobs.Id",
-                Where = c => c.Id == id
-            });
-
-            CustomerUnitDTO cdto = new CustomerUnitDTO();
-            cdto.Load(customer);
-
-            return View(cdto);
+            // need sp joins to get designs and jobs
+            // only pull certain columns from db and put in view model
         }
 
+        [HttpGet]
         public IActionResult MyDesigns(int id)
         {
-            var designs = hctx.Designs.Where(d => d.Customer_Id == id);
-            List<DesignDTO> dtos = new List<DesignDTO>();
-            DesignDTO? dto = new DesignDTO();
-
-            foreach (Design design in designs)
-            {
-                dto.Load(design);
-                dtos.Append(dto);
-            }
-
-            return View(dtos);
+            IEnumerable<Design> designs = DesignRepo.GetCustomerDesigns(id);
+            // need vm
+            return designs == null ? View(Enumerable.Empty<Design>()) : View(designs);
         }
         public IActionResult MyJobs(int id)
         {
-            var jobs = hctx.Jobs.Where(j => j.Customer_Id == id);
-            List<JobDTO> dtos = new List<JobDTO>();
-            JobDTO dto = new JobDTO();
-
-            foreach (Job job in jobs)
-            {
-                dto.Load(job);
-                dtos.Append(dto);
-            }
-
-            return View(dtos);
+            IEnumerable<Job> jobs = JobRepo.GetCustomerJobs(id);
+            return jobs == null ? View(Enumerable.Empty<Job>()) : View(jobs);
         }
     }
 }

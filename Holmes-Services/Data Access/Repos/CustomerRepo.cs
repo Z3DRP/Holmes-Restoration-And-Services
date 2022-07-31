@@ -5,12 +5,12 @@ using MySql.Data.MySqlClient;
 
 namespace Holmes_Services.Data_Access.Repos
 {
-    public class CustomerRepo : ICustomerRepo
+    public static class CustomerRepo
     {
-        private string _con = DbConnector.GetConnection();
-        private IEnumerable<Customer> _customers;
+        private static string _con = DbConnector.GetConnection();
+        private static IEnumerable<Customer>? _customers;
 
-        public IEnumerable<Customer> GetAllCustomers()
+        public static IEnumerable<Customer> GetAllCustomers()
         {
             string procedure = "[sp_GetCustomers]";
             InitCustomers();
@@ -20,39 +20,38 @@ namespace Holmes_Services.Data_Access.Repos
                 _customers = db.Query<Customer>(procedure, commandType: CommandType.StoredProcedure).ToList();
             }
 
-            return _customers == null ? new List<Customer>() : _customers;
+            return _customers == null ? Enumerable.Empty<Customer>() : _customers;
         }
 
-        public IEnumerable<Customer> GetCustomerById(int id)
+        public static Customer GetCustomerById(int id)
         {
             string procedure = "[sp_GetCustomerById]";
             var parameter = new { id = id };
-            InitCustomers();
+            Customer customer = new Customer();
 
             using (IDbConnection db = new MySqlConnection(_con))
             {
                 _customers = db.Query<Customer>(procedure, parameter, commandType: CommandType.StoredProcedure).ToList();
             }
 
-            return _customers == null ? new List<Customer>() : _customers;
+            return customer == null ? new Customer() : customer;
         }
 
-        public IEnumerable<Customer> GetCustomerByName(string firstname, string lastname)
+        public static Customer GetCustomerByName(string firstname, string lastname)
         {
             string procedure = "[sp_GetCustomerByName]";
             var parameters = new {firstname = firstname, lastname = lastname };
-            InitCustomers();
+            Customer customer = new Customer();
 
             using (IDbConnection db = new MySqlConnection(_con))
             {
-                _customers = db.Query<Customer>(procedure, parameters, commandType: CommandType.StoredProcedure).ToList();
+                customer = db.QuerySingle<Customer>(procedure, parameters, commandType: CommandType.StoredProcedure);
             }
 
-            return _customers == null ? new List<Customer>() : _customers;
-
+            return customer == null ? new Customer() : customer;
         }
 
-        public IEnumerable<Customer> SearchCustomers(string firstname, string lastname)
+        public static IEnumerable<Customer> SearchCustomers(string firstname, string lastname)
         {
             string procedure = "[sp_search_customers]";
             var parameters = new { firstname = firstname, lastname = lastname };
@@ -66,7 +65,7 @@ namespace Holmes_Services.Data_Access.Repos
             return _customers == null ? Enumerable.Empty<Customer>() : _customers;
         }
 
-        public bool AddCustomer(Customer customer)
+        public static bool AddCustomer(Customer customer)
         {
             string procedure = "[sp_AddCustomer]";
             int rowsAffected = 0;
@@ -91,7 +90,7 @@ namespace Holmes_Services.Data_Access.Repos
             return rowsAffected > 0 ? true : false;
         }
 
-        public bool UpdateCustomer(Customer customer)
+        public static bool UpdateCustomer(Customer customer)
         {
             string procedure = "[sp_UpdateCustomer]";
             int rowsAffected = 0;
@@ -115,7 +114,7 @@ namespace Holmes_Services.Data_Access.Repos
             return rowsAffected > 0 ? true : false;
         }
 
-        public bool DeleteCustomer(int id)
+        public static bool DeleteCustomer(int id)
         {
             string procedure = "[sp_DeleteCustomer]";
             var parameter = new { id = id };
@@ -129,7 +128,7 @@ namespace Holmes_Services.Data_Access.Repos
             return rowsAffect > 0 ? true : false;
         }
 
-        public bool VerifyCustomer(string firstname, string lastname)
+        public static bool VerifyCustomer(string firstname, string lastname)
         {
             string procedure = "[sp_verify_custmomer]";
             var parameters = new {firstname = firstname, lastname = lastname };
@@ -142,7 +141,21 @@ namespace Holmes_Services.Data_Access.Repos
 
             return doesExist;
         }
-        public void InitCustomers() => _customers = new List<Customer>();
+
+        public static bool VerifyCustomerById(int id)
+        {
+            string procedure = "[sp_verify_custmomer_byId]";
+            var parameters = new { customerID = id };
+            bool doesExist;
+
+            using (IDbConnection db = new MySqlConnection(_con))
+            {
+                doesExist = db.ExecuteScalar<bool>(procedure, parameters, commandType: CommandType.StoredProcedure);
+            }
+
+            return doesExist;
+        }
+        public static void InitCustomers() => _customers = new List<Customer>();
         
     }
 }

@@ -10,5 +10,14 @@ namespace Holmes_Services.Models.ViewModels
         public Deck_Type Type { get; set; }
         public string Image { get; set; }
         public double Price { get; set; }
+
+        public DeckViewModel(Decking deck)
+        {
+            Id = deck.Id;
+            Name = deck.Name;
+            Type = deck.Type;
+            Image = deck.Image;
+            Price = deck.Price_Per_SqFt;
+        }
     }
 }

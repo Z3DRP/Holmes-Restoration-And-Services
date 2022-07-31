@@ -1,4 +1,5 @@
-﻿using Holmes_Services.Models;
+﻿using Holmes_Services.Data_Access.Repos;
+using Holmes_Services.Models;
 using Holmes_Services.Models.DomainModels;
 using Holmes_Services.Models.DTOs;
 using Holmes_Services.Models.Extensions;
@@ -32,42 +33,20 @@ namespace Holmes_Services.Controllers
             design.Load(Ctx);
             return design;
         }
-        public ViewResult List(DesignGridDTO designs)
+        public ViewResult List()
         {
-            var builder = new DesignGridBuilder(HttpContext.Session, designs, defaultSortField: nameof(Design.Id));
-            var options = new DesignQueryOptions
-            {
-                Includes = "Customer, Jobs",
-                OrderByDirection = builder.CurrentRoute.SortDirection,
-                PageNumber = builder.CurrentRoute.PageNumber,
-                PageSize = builder.CurrentRoute.PageSize
-            };
-            options.SortFilter(builder);
-            var vm = new DesignListViewModel
-            {
-                Designs = data.Designs.List(options),
-                CurrentRoute = builder.CurrentRoute,
-                TotalPages = builder.GetTotalPages(data.Designs.Count),
-            };
-
-            return View(vm);
+            IEnumerable<Design> designs = DesignRepo.GetAllDesigns();
+            return designs == null ? View(Enumerable.Empty<Design>()) : View(designs);
         }
         public ViewResult Details(int id)
         {
-            var design = data.Designs.Get(new QueryOptions<Design>
-            {
-                Where = d => d.Id == id
-            });
-
-            return View(design);
+            Design design = DesignRepo.GetDesignById(id);
+            return design == null ? View(new Design()) : View(design);
         }
         [HttpPost]
         public RedirectToActionResult Add(int id)
         {
-            var design = Ctx.Get(new QueryOptions<Design>
-            {
-                Where = d => d.Id == id
-            });
+            Design design = DesignRepo.GetDesignById(id);
 
             if (design == null)
                 TempData["message"] = "Unable to add design";
@@ -81,40 +60,57 @@ namespace Holmes_Services.Controllers
                     Price = ddto.Estimate
                 };
 
-                db.Designs.Add(design);
-                db.SaveChanges();
                 DesignSession dsesh = new DesignSession(HttpContext);
-                dsesh.Add(ditem);
-                dsesh.Save();
 
-                TempData["message"] = "Design has been added";
-
+                if (dsesh.Count > 0)
+                    return RedirectToAction("Edit", ditem);
+                else
+                {
+                    dsesh.Add(ditem);
+                    dsesh.Save();
+                    TempData["message"] = "Design has been added";
+                }
             }
-            var builder = new DesignGridBuilder(HttpContext.Session);
-            return RedirectToAction("List", "Design", builder.CurrentRoute);
-        }
-        [HttpGet]
-        public IActionResult Remove(int id)
-        {
-            var design = db.Designs.FirstOrDefault(d => d.Id == id);
-            TempData["message"] = "Delete Design";
-            // add a view model
-            return View(design);
-
+            // might need to redirect some where else
+            return RedirectToAction("Index");
         }
         [HttpPost]
+        public IActionResult Remove(int id)
+        {
+            bool wasDeleted, doesExist = DesignRepo.VerifyDesignById(id);
+            
+            if (doesExist)
+            {
+                wasDeleted = DesignRepo.DeleteDesign(id);
+
+                if (wasDeleted)
+                    TempData["message"] = "Your design was deleted";
+                else
+                    TempData["message"] = "An error occured while deleting design";
+                // need to redirect to " My Designs " or something
+                return RedirectToAction("List");
+            }
+            else
+                TempData["message"] = "Design does not exist";
+
+            // need to redirect to " My Designs " or something
+            return RedirectToAction("List");
+
+        }
+        [HttpGet]
         public RedirectToActionResult Remove(Design design)
         {
             DesignSession dsesh = GetDesign();
             DesignItem? ditem = dsesh.GetById(design.Id);
             if (ditem != null)
             {
-                db.Designs.Remove(design);
-                db.SaveChanges();
                 dsesh.Remove(ditem);
                 dsesh.Save();
                 TempData["message"] = "Design has been removed";
             }
+            else
+                TempData["message"] = "Unable to remove design";
+
             return RedirectToAction("Index");
         }
         [HttpPost]
@@ -129,7 +125,7 @@ namespace Holmes_Services.Controllers
         }
         public IActionResult Edit(int id)
         {
-            var design = db.Designs.FirstOrDefault(d => d.Id == id);
+            var design = DesignRepo.GetDesignById(id);
 
             if (design == null)
             {
@@ -147,13 +143,21 @@ namespace Holmes_Services.Controllers
             if (ModelState.IsValid)
             {
                 DesignSession dsesh = GetDesign();
-                DesignItem ditem = dsesh.GetById(design.Id);
-                dsesh.Edit(ditem);
-                dsesh.Save();
-                db.Designs.Update(design);
-                db.SaveChanges();
-                TempData["message"] = "Design updated";
-                return RedirectToAction("Index", "Home");
+                DesignItem? ditem = dsesh.GetById(design.Id);
+
+                if (ditem != null)
+                {
+                    dsesh.Edit(ditem);
+                    dsesh.Save();
+                    bool added = DesignRepo.UpdateDesign(design);
+                    TempData["message"] = "Design updated";
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    TempData["message"] = "Design Id Not Found";
+                    return View(design);
+                }
             }
             else
                 return View(design);
