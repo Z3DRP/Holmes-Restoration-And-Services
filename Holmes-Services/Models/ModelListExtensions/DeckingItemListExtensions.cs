@@ -10,7 +10,6 @@ namespace Holmes_Services.Models.ModelListExtensions
             list.Select(d => new DeckItemDTO
             {
                 DeckId = d.Deck.DeckId,
-                Price = d.Price
             }).ToList();
     }
 }

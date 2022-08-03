@@ -1,4 +1,6 @@
-﻿using Holmes_Services.Models;
+﻿using Holmes_Services.Data_Access.Repos;
+using Holmes_Services.Models;
+using Holmes_Services.Models.DomainModels;
 using Holmes_Services.Models.DTOs;
 using Holmes_Services.Models.Repositories;
 using Holmes_Services.Models.ViewModels;
@@ -11,15 +13,6 @@ namespace Holmes_Services.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private HolmesServiceUnit data { get; set; }
-        private HolmesContext Ctx { get; set; }
-
-        //public HomeController(HolmesContext ctx) => data = new HolmesServiceUnit(ctx);
-        public HomeController(HolmesContext ctx)
-        {
-            data = new HolmesServiceUnit(ctx);
-            Ctx = ctx;
-        }
 
         public IActionResult Index()
         {
@@ -27,58 +20,30 @@ namespace Holmes_Services.Controllers
         }
         public IActionResult Customer()
         {
-            var customers = Ctx.Customers.OrderBy(c => c.Id);
-            var customersViewModel = new CustomerListViewModel
-            {
-                Customers = Ctx.Customers.OrderBy(c => c.Id)
-
-            };
-            return View(customersViewModel);
-        }
-        public IActionResult Contact()
-        {
             return View();
         }
         public IActionResult Ideas()
         {
-            var ideas = Ctx.Ideas.OrderBy(i => i.Id);
-            List<IdeaDTO> ideaDTOs = new List<IdeaDTO>();
-
-            foreach (var ideasViewModel in ideas)
-            {
-                IdeaDTO idto = new IdeaDTO
-                {
-                    Id = ideasViewModel.Id,
-                    Deck = ideasViewModel.Deck,
-                    Rail = ideasViewModel.Rail,
-                    Estimate = ideasViewModel.Estimate
-                };
-                ideaDTOs.Add(idto);
-            }
-
-            return View(ideaDTOs);
+            IEnumerable<Idea> ideas = IdeaRepo.GetAllIdeas();
+            // eventually incorporate idea vm
+            return ideas == null ? View(Enumerable.Empty<Idea>()) : View(ideas);
         }
         public IActionResult Portfollio()
         {
-            var portfollios = Ctx.CompletedJobs.OrderBy(c => c.Id);
-            List<PortfollioDTO> portfollioDTOs = new List<PortfollioDTO>();
+            IEnumerable<CompletedJob> portfollio = PortfollioRepo.GetPortfollio();
+            return portfollio == null ? View(Enumerable.Empty<CompletedJob>()) : View(portfollio);
 
-            foreach (var portfollio in portfollios)
-            {
-                PortfollioDTO pdto = new PortfollioDTO
-                {
-                    Id = portfollio.Id,
-                    Deck = portfollio.Job.Design.Deck,
-                    Rail = portfollio.Job.Design.Rail,
-                    Pattern = portfollio.Job.Design.Pattern,
-                    Estimate = portfollio.Job.Design.Estimate,
-                    Image = portfollio.Image
-                };
-                portfollioDTOs.Add(pdto);
-            }
-
-            return View(portfollioDTOs);
-
+        }
+        [HttpGet]
+        public IActionResult Contact(int id)
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult Contact(HolmesMessage msg)
+        {
+            // this method will create a message obj in db
+            return View();
         }
         public IActionResult Privacy()
         {

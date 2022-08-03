@@ -9,7 +9,6 @@ namespace Holmes_Services.Models.ModelListExtensions
             list.Select(r => new RailItemDTO
             {
                 RailId = r.Rail.RailId,
-                Price = r.Rail.Price
             }).ToList();
     }
 }

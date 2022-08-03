@@ -7,10 +7,6 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// get the connection from appsetting eventually need to make it
-// use user secrets
-string connection = builder.Configuration.GetConnectionString("HolmesContext");
-
 // Add services to the container.
 builder.Services.AddMemoryCache();
 builder.Services.AddSession(options =>
@@ -18,13 +14,6 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 builder.Services.AddControllersWithViews().AddNewtonsoftJson();
-builder.Services.AddDbContext<HolmesContext>(options =>
-{
-options.UseMySql(connection, ServerVersion.AutoDetect(connection),
-    mySqlOptions => mySqlOptions.EnableRetryOnFailure(
-        maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null)
-);
-});
 
 var app = builder.Build();
 

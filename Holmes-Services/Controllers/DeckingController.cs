@@ -34,13 +34,23 @@ namespace Holmes_Services.Controllers
         public ViewResult List(DeckingGridDTO decks)
         {
             IEnumerable<Decking> deckings = DeckRepo.GetAllDecks();
-
-            return deckings == null ? View(Enumerable.Empty<Decking>()) : View(deckings);
+            List<DeckingViewModel> deckViewModels = new List<DeckingViewModel>();
+            TempData["title"] = "Holmes Services";
+            if (deckings != null)
+            {
+                foreach (Decking deck in deckings)
+                {
+                    DeckingViewModel singleVM = new DeckingViewModel(deck);
+                    deckViewModels.Append(singleVM);
+                }
+            }
+            return deckViewModels == null ? View(Enumerable.Empty<DeckingViewModel>()) : View(deckViewModels);
         }
         public ViewResult Details(int id)
         {
             Decking deck = DeckRepo.GetDeckById(id);
-            return deck == null ? View(Enumerable.Empty<Decking>()) : View(deck);
+            DeckViewModel deckVM = new DeckViewModel(deck);
+            return deckVM == null ? View(new DeckViewModel()) : View(deckVM);
         }
 
         [HttpPost]

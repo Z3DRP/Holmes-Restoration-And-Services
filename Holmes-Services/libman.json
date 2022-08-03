@@ -3,16 +3,19 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "font-awesome@6.1.1",
-      "destination": "wwwroot/lib/font-awesome/"
-    },
-    {
+      "provider": "cdnjs",
       "library": "jquery@3.6.0",
       "destination": "wwwroot/lib/jquery/"
     },
     {
-      "library": "jqueryui@1.12.1",
-      "destination": "wwwroot/lib/jqueryui/"
+      "provider": "cdnjs",
+      "library": "bootstrap@5.2.0",
+      "destination": "wwwroot/lib/bootstrap/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "font-awesome@6.1.2",
+      "destination": "wwwroot/lib/font-awesome/"
     }
   ]
 }

@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Holmes_Services</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
     <link rel="stylesheet" href="~/Holmes_Services.styles.css" asp-append-version="true" />
 </head>
@@ -25,7 +25,7 @@
 
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse" id="menu">
                     <ul class="navbar-nav flex-grow-1 mr-auto">
-                        <li class="nav-item @Nav.Active("Home",current)">
+                        <li class="nav-item @Nav.Active("Home", current)">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
                                 <span class="fas fa-home"></span>&nbsp;Home
                             </a>
@@ -76,10 +76,9 @@
             &copy; 2022 - HolmesServices - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="~/lib/jqueryui/jquery-ui.min.js"></script>
-    @RenderSection("Scripts", required: false)
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: true)
 </body>
 </html>

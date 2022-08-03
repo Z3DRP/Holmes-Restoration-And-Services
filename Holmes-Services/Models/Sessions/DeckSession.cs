@@ -49,7 +49,6 @@ namespace Holmes_Services.Models.Sessions
                     DeckItem dItem = new DeckItem
                     {
                         Deck = ddto,
-                        Price = storedDeck.Price
                     };
                     decks.Add(dItem);
                 }

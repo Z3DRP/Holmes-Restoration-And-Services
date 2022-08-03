@@ -11,6 +11,7 @@ namespace Holmes_Services.Models.ViewModels
         public string Image { get; set; }
         public double Price { get; set; }
 
+        public DeckViewModel() { }
         public DeckViewModel(Decking deck)
         {
             Id = deck.Id;

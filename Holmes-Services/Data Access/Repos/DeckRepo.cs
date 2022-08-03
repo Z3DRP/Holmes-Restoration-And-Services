@@ -13,7 +13,8 @@ namespace Holmes_Services.Data_Access.Repos
         public static IEnumerable<Decking> GetAllDecks()
         {
             string procedure = "[sp_GetDecking]";
-            _decking = new List<Decking>();
+            InitDecks();
+            
             using (IDbConnection db = new MySqlConnection(_con))
             {
                 _decking = db.Query<Decking>(procedure, commandType: CommandType.StoredProcedure).ToList();
@@ -25,7 +26,7 @@ namespace Holmes_Services.Data_Access.Repos
         {
             string procedure = "[sp_get_decks_by_price]";
             var parameter = new { price = price };
-            _decking = new List<Decking>();
+            InitDecks();
 
             using (IDbConnection db = new MySqlConnection(_con))
             {
@@ -51,7 +52,7 @@ namespace Holmes_Services.Data_Access.Repos
         {
             string procedure = "[sp_GetDeckByType]";
             var parameter = new { type = type };
-            _decking = new List<Decking>();
+            InitDecks();
 
             using (IDbConnection db = new MySqlConnection(_con))
             {
@@ -64,7 +65,7 @@ namespace Holmes_Services.Data_Access.Repos
         {
             string procedure = "[sp_get_decks_by_groupId]";
             var parameter = new { groupId = gId };
-            _decking = new List<Decking>();
+            InitDecks();
 
             using (IDbConnection db = new MySqlConnection(_con))
             {
@@ -101,5 +102,7 @@ namespace Holmes_Services.Data_Access.Repos
 
             return doesExist;
         }
+
+        private static void InitDecks() => _decking = new List<Decking>();
     }
 }

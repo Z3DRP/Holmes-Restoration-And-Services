@@ -63,6 +63,7 @@ namespace Holmes_Services.Controllers
         {
             // need sp joins to get designs and jobs
             // only pull certain columns from db and put in view model
+            return View();
         }
 
         [HttpGet]
